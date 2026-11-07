@@ -6,97 +6,106 @@
 
     var PLUGIN_NAME = 'Netflix Episodes';
 
-    /* ------------------------------ styles ------------------------------ */
+    /* ------------------------------ styles (Tizen-safe) ------------------------------ */
 
     var CSS = `
 .nfx-episodes{
-    padding: 0 1.2em 1.5em;
+    padding: 10px 20px 20px;
+    background: #111115;
+    box-sizing: border-box;
+    width: 100%;
 }
 .nfx-episodes__strip-wrap{
     overflow-x: auto;
     overflow-y: hidden;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
-    margin: 0 -1.2em;
-    padding: 0.8em 1.2em 0.4em;
+    margin: 0 -20px;
+    padding: 10px 20px;
+    white-space: nowrap;
 }
 .nfx-episodes__strip-wrap::-webkit-scrollbar{ display: none; }
 .nfx-episodes__strip{
     display: flex;
-    gap: 0.9em;
     align-items: center;
+}
+.nfx-episodes__strip > * {
+    margin-right: 12px;
+}
+.nfx-episodes__strip > *:last-child {
+    margin-right: 0;
 }
 .nfx-season{
     flex: 0 0 auto;
-    font-size: 1em;
+    font-size: 14px;
     font-weight: 700;
     text-transform: uppercase;
-    opacity: 0.8;
-    padding: 0 0.5em;
+    color: #aaaaaa;
+    padding: 8px 12px;
+    background: #1e1e24;
+    border-radius: 4px;
     user-select: none;
-    letter-spacing: 0.05em;
-    color: #fff;
+    letter-spacing: 1px;
 }
 .nfx-card{
     flex: 0 0 auto;
-    width: 11.5em;
-    padding: 1.1em 1em 1em;
-    border-radius: 0.6em;
-    background: rgba(30, 30, 35, 0.85);
-    border: 2px solid rgba(255, 255, 255, 0.15);
+    width: 170px;
+    padding: 14px 12px;
+    border-radius: 6px;
+    background: #25252c;
+    border: 2px solid #3a3a44;
     cursor: pointer;
-    transition: background .15s, transform .15s, border-color .15s, box-shadow .15s;
     box-sizing: border-box;
 }
 .nfx-card.focus{
-    background: rgba(50, 50, 60, 0.95);
+    background: #3b3b47;
     border-color: #ffffff;
-    transform: scale(1.08);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
+    transform: scale(1.04);
 }
 .nfx-card__num{
-    font-size: 2.2em;
+    font-size: 30px;
     font-weight: 800;
     line-height: 1;
     color: #ffffff;
-    opacity: 0.95;
-    margin-bottom: .35em;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    margin-bottom: 6px;
 }
 .nfx-card__name{
-    font-size: 1.1em;
+    font-size: 14px;
     font-weight: 500;
     line-height: 1.3;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    min-height: 2.6em;
-    color: #e0e0e0;
-    opacity: 0.9;
+    height: 36px;
+    color: #dddddd;
+    white-space: normal;
 }
 .nfx-card.focus .nfx-card__name{ 
-    color: #ffffff;
-    opacity: 1; 
+    color: #ffffff; 
 }
-.nfx-card--watched{ opacity: .55; }
+.nfx-card--watched{ opacity: 0.5; }
 .nfx-card--file .nfx-card__num{
-    font-size: 1.2em;
-    font-weight: 500;
+    font-size: 18px;
+    font-weight: 600;
 }
 
 .nfx-detail{
     display: flex;
-    gap: 1.6em;
-    margin-top: 1.4em;
+    margin-top: 20px;
     align-items: flex-start;
+}
+.nfx-detail > * {
+    margin-right: 24px;
+}
+.nfx-detail > *:last-child {
+    margin-right: 0;
 }
 .nfx-detail__img{
     flex: 0 0 auto;
-    width: 22em;
-    max-width: 38vw;
-    aspect-ratio: 16/9;
-    border-radius: 0.5em;
+    width: 320px;
+    height: 180px;
+    border-radius: 8px;
     overflow: hidden;
     background: #1a1a1a;
     position: relative;
@@ -112,60 +121,51 @@
 .nfx-detail__img img.loaded{ opacity: 1; }
 .nfx-detail__img-empty{
     position: absolute;
-    inset: 0;
+    top: 0; left: 0; right: 0; bottom: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 3em;
+    font-size: 36px;
     font-weight: 700;
-    color: rgba(255,255,255,0.25);
-    background: linear-gradient(135deg,#20242b,#14161a);
+    color: #555555;
+    background: #1c1f24;
 }
-.nfx-detail__body{ min-width: 0; flex: 1; }
+.nfx-detail__body{ 
+    min-width: 0; 
+    flex: 1; 
+}
 .nfx-detail__title{
-    font-size: 1.7em;
-    font-weight: 600;
+    font-size: 24px;
+    font-weight: 700;
     line-height: 1.2;
-    margin-bottom: .35em;
-    color: #fff;
+    margin-bottom: 6px;
+    color: #ffffff;
 }
 .nfx-detail__meta{
-    font-size: 1.05em;
-    font-weight: 300;
-    opacity: .75;
-    margin-bottom: .8em;
-    color: #fff;
+    font-size: 15px;
+    font-weight: 400;
+    color: #aaaaaa;
+    margin-bottom: 12px;
 }
 .nfx-detail__meta span + span::before{
     content: ' • ';
-    opacity: .6;
+    opacity: 0.6;
 }
 .nfx-detail__meta .nfx-detail__size{
-    background: rgba(255,255,255,0.12);
-    border-radius: .3em;
-    padding: .1em .45em;
+    background: #333333;
+    color: #ffffff;
+    border-radius: 4px;
+    padding: 2px 8px;
 }
 .nfx-detail__overview{
-    font-size: 1.15em;
-    font-weight: 300;
+    font-size: 16px;
+    font-weight: 400;
     line-height: 1.5;
-    opacity: .9;
-    max-width: 60em;
-    color: #ddd;
+    color: #dddddd;
+    max-width: 900px;
+    white-space: normal;
 }
-.nfx-detail__overview--empty{ opacity: .45; font-style: italic; }
-
-body.platform--browser .nfx-detail__img{ max-width: 30em; }
-
-@media screen and (max-width: 767px){
-    .nfx-episodes{ padding: 0 .8em 1em; }
-    .nfx-card{ width: 9em; padding: .9em .8em .8em; }
-    .nfx-card__num{ font-size: 1.6em; }
-    .nfx-detail{ flex-direction: column; gap: 1em; }
-    .nfx-detail__img{ width: 100%; max-width: 100%; }
-    .nfx-detail__title{ font-size: 1.35em; }
-    .nfx-detail__overview{ font-size: 1em; }
-}
+.nfx-detail__overview--empty{ opacity: 0.45; font-style: italic; }
 `;
 
     var pairs = [];
@@ -193,7 +193,6 @@ body.platform--browser .nfx-detail__img{ max-width: 30em; }
         return !!(el && el.season != null && el.episode != null && el.episode !== '');
     }
 
-    // Проверка, является ли контент реальным сериалом (должны быть сезоны в параметрах)
     function hasValidSeasons(params) {
         if (!params || !params.seasons) return false;
         var keys = Object.keys(params.seasons);
@@ -306,16 +305,13 @@ body.platform--browser .nfx-detail__img{ max-width: 30em; }
     }
 
     function anyEpisodes() {
-        // Дополнительно проверяем наличие сезонов через params_ref
         if (!hasValidSeasons(params_ref)) return false;
-        
         var epCount = 0;
         for (var i = 0; i < pairs.length; i++) {
             if (isEpisodeElement(pairs[i].element)) {
                 epCount++;
             }
         }
-        // Если серий меньше 2, скорее всего это фильм или одиночный файл
         return epCount >= 2;
     }
 
@@ -343,7 +339,13 @@ body.platform--browser .nfx-detail__img{ max-width: 30em; }
         if (!modal || !modal.length) return false;
         modal_ref = modal;
 
-        if (modal.find('.nfx-episodes').length) { built = true; return true; }
+        var existingUi = modal.find('.nfx-episodes');
+        if (existingUi.length) {
+            ui = existingUi;
+            detail = ui.find('.nfx-detail');
+            built = true;
+            return true;
+        }
 
         var filesBox = findFilesBox(modal);
         if (!filesBox.length) return false;
@@ -371,7 +373,9 @@ body.platform--browser .nfx-detail__img{ max-width: 30em; }
             var seasonKey = isEpisodeElement(el) ? ('s' + el.season) : 'other';
             if (seasonKey !== lastSeason) {
                 lastSeason = seasonKey;
-                strip.append('<div class="nfx-season">' + esc(seasonLabel(el)) + '</div>');
+                // Добавляем отступ слева для первой плашки сезона, чтобы она не прижималась вплотную к краю
+                var seasonClass = 'nfx-season' + (strip.children().length === 0 ? ' nfx-season--first' : '');
+                strip.append('<div class="' + seasonClass + '">' + esc(seasonLabel(el)) + '</div>');
             }
 
             var card = cardHtml(pair);
@@ -379,12 +383,11 @@ body.platform--browser .nfx-detail__img{ max-width: 30em; }
 
             card.on('hover:focus', function () {
                 updateDetail(pair);
-                try {
-                    if (card[0] && card[0].scrollIntoView) {
-                        card[0].scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
-                    }
-                } catch (e) {
-                    if (stripWrap && card[0]) stripWrap.scrollLeft = card[0].offsetLeft - stripWrap.clientWidth / 2;
+                if (stripWrap && card[0]) {
+                    var cardLeft = card[0].offsetLeft;
+                    var cardWidth = card[0].offsetWidth;
+                    var wrapWidth = stripWrap.clientWidth;
+                    stripWrap.scrollLeft = cardLeft - (wrapWidth / 2) + (cardWidth / 2);
                 }
                 try { if (pair.item) pair.item.trigger('hover:focus'); } catch (e) {}
             });
@@ -531,4 +534,3 @@ body.platform--browser .nfx-detail__img{ max-width: 30em; }
         }, 200);
     }
 })();
-```[cite: 3]
