@@ -10,26 +10,26 @@
 
     var CSS = `
 .nfx-episodes{
-    padding: 10px 20px 20px;
+    padding: 0 1.2em 1.5em;
     background: #111115;
     box-sizing: border-box;
     width: 100%;
 }
 .nfx-season-header{
-    font-size: 14px;
+    font-size: 1.1em;
     font-weight: 700;
     text-transform: uppercase;
     color: #aaaaaa;
-    margin-bottom: 8px;
-    letter-spacing: 1px;
+    margin-bottom: 0.6em;
+    letter-spacing: 0.05em;
 }
 .nfx-episodes__strip-wrap{
     overflow-x: auto;
     overflow-y: hidden;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
-    margin: 0 -20px;
-    padding: 0 20px 10px;
+    margin: 0 -1.2em;
+    padding: 0.4em 1.2em 0.8em;
     white-space: nowrap;
 }
 .nfx-episodes__strip-wrap::-webkit-scrollbar{ display: none; }
@@ -38,16 +38,16 @@
     align-items: center;
 }
 .nfx-episodes__strip > * {
-    margin-right: 12px;
+    margin-right: 0.9em;
 }
 .nfx-episodes__strip > *:last-child {
     margin-right: 0;
 }
 .nfx-card{
     flex: 0 0 auto;
-    width: 170px;
-    padding: 14px 12px;
-    border-radius: 6px;
+    width: 12.5em;
+    padding: 1.1em 1em 1em;
+    border-radius: 0.5em;
     background: #25252c;
     border: 2px solid #3a3a44;
     cursor: pointer;
@@ -56,24 +56,24 @@
 .nfx-card.focus{
     background: #3b3b47;
     border-color: #ffffff;
-    transform: scale(1.04);
+    transform: scale(1.06);
 }
 .nfx-card__num{
-    font-size: 30px;
+    font-size: 2.2em;
     font-weight: 800;
     line-height: 1;
     color: #ffffff;
-    margin-bottom: 6px;
+    margin-bottom: 0.3em;
 }
 .nfx-card__name{
-    font-size: 14px;
+    font-size: 1.05em;
     font-weight: 500;
     line-height: 1.3;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    height: 36px;
+    height: 2.6em;
     color: #dddddd;
     white-space: normal;
 }
@@ -82,26 +82,26 @@
 }
 .nfx-card--watched{ opacity: 0.5; }
 .nfx-card--file .nfx-card__num{
-    font-size: 18px;
+    font-size: 1.3em;
     font-weight: 600;
 }
 
 .nfx-detail{
     display: flex;
-    margin-top: 20px;
+    margin-top: 1.2em;
     align-items: flex-start;
 }
 .nfx-detail > * {
-    margin-right: 24px;
+    margin-right: 1.5em;
 }
 .nfx-detail > *:last-child {
     margin-right: 0;
 }
 .nfx-detail__img{
     flex: 0 0 auto;
-    width: 320px;
-    height: 180px;
-    border-radius: 8px;
+    width: 22em;
+    height: 12.375em;
+    border-radius: 0.5em;
     overflow: hidden;
     background: #1a1a1a;
     position: relative;
@@ -121,7 +121,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 36px;
+    font-size: 2.5em;
     font-weight: 700;
     color: #555555;
     background: #1c1f24;
@@ -131,17 +131,17 @@
     flex: 1; 
 }
 .nfx-detail__title{
-    font-size: 24px;
+    font-size: 1.6em;
     font-weight: 700;
     line-height: 1.2;
-    margin-bottom: 6px;
+    margin-bottom: 0.3em;
     color: #ffffff;
 }
 .nfx-detail__meta{
-    font-size: 15px;
+    font-size: 1.05em;
     font-weight: 400;
     color: #aaaaaa;
-    margin-bottom: 12px;
+    margin-bottom: 0.8em;
 }
 .nfx-detail__meta span + span::before{
     content: ' • ';
@@ -150,15 +150,15 @@
 .nfx-detail__meta .nfx-detail__size{
     background: #333333;
     color: #ffffff;
-    border-radius: 4px;
-    padding: 2px 8px;
+    border-radius: 0.3em;
+    padding: 0.1em 0.5em;
 }
 .nfx-detail__overview{
-    font-size: 16px;
+    font-size: 1.1em;
     font-weight: 400;
     line-height: 1.5;
     color: #dddddd;
-    max-width: 900px;
+    max-width: 55em;
     white-space: normal;
 }
 .nfx-detail__overview--empty{ opacity: 0.45; font-style: italic; }
