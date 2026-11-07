@@ -159,14 +159,12 @@ body.platform--browser .nfx-detail__img{ max-width: 30em; }
 }
 `;
 
-    /* ------------------------------ state ------------------------------- */
-
-    var pairs = [];          // [{element, item}] collected from 'render' events
-    var ui = null;           // our root jQuery node
-    var detail = null;       // detail panel node
-    var active = false;      // a files list is currently open
-    var built = false;       // our UI has been inserted
-    var serial_decided = false; // we already decided this list is/isn't serials
+    var pairs = [];
+    var ui = null;
+    var detail = null;
+    var active = false;
+    var built = false;
+    var serial_decided = false;
     var is_serial = false;
     var retry_timer = null;
     var fallback_timer = null;
@@ -174,10 +172,12 @@ body.platform--browser .nfx-detail__img{ max-width: 30em; }
     var modal_ref = null;
     var modal_observer = null;
 
-    /* ------------------------------ helpers ----------------------------- */
-
     function esc(s) {
-        return $('<div>').text(s == null ? '' : s).html();
+        try {
+            return $('<div>').text(s == null ? '' : s).html();
+        } catch (e) {
+            return '';
+        }
     }
 
     function isEpisodeElement(el) {
@@ -197,12 +197,10 @@ body.platform--browser .nfx-detail__img{ max-width: 30em; }
         var list = episodesArrayFor(element && element.season, params);
         if (!list) return null;
         for (var i = 0; i < list.length; i++) {
-            if (list[i].episode_number == element.episode) return list[i];
+            if (list[i] && list[i].episode_number == element.episode) return list[i];
         }
         return null;
     }
-
-    /* ------------------------------ UI bits ----------------------------- */
 
     function cardHtml(pair) {
         var el = pair.element;
@@ -235,10 +233,10 @@ body.platform--browser .nfx-detail__img{ max-width: 30em; }
         var meta = findEpisodeMeta(el, params_ref);
         var isEp = isEpisodeElement(el);
 
-        var img = el.img
-            || (meta && meta.still_path && Lampa.Api && Lampa.Api.img
-                ? Lampa.Api.img(meta.still_path)
-                : '');
+        var img = '';
+        try {
+            img = el.img || (meta && meta.still_path && window.Lampa && Lampa.Api && Lampa.Api.img ? Lampa.Api.img(meta.still_path) : '');
+        } catch (e) {}
 
         var title = isEp
             ? ((meta && meta.name) || el.fname || el.title || ('Эпизод ' + el.episode))
@@ -278,8 +276,6 @@ body.platform--browser .nfx-detail__img{ max-width: 30em; }
         }
     }
 
-    /* ------------------------------ modal find -------------------------- */
-
     function findModal() {
         if (modal_ref && modal_ref.length && modal_ref.closest('body').length) return modal_ref;
         var m = $('.modal:visible').last();
@@ -293,8 +289,6 @@ body.platform--browser .nfx-detail__img{ max-width: 30em; }
         return box.length ? box : $();
     }
 
-    /* ------------------------------ build UI ---------------------------- */
-
     function anyEpisodes() {
         for (var i = 0; i < pairs.length; i++) {
             if (isEpisodeElement(pairs[i].element)) return true;
@@ -303,19 +297,14 @@ body.platform--browser .nfx-detail__img{ max-width: 30em; }
     }
 
     function decideSerial() {
-        // is_serial=true only when we actually saw an episode element.
-        // For non-serial file lists (movies, single files) we keep the original UI.
         if (serial_decided) return;
         if (anyEpisodes()) {
             is_serial = true;
             serial_decided = true;
         }
-        // If nothing episode-like yet, we stay undecided: render events that
-        // may still arrive, or list_open's raw items may hint otherwise.
     }
 
     function decideSerialFallback() {
-        // Called when we never saw an episode element. Treat as not serial.
         if (!serial_decided) {
             serial_decided = true;
             is_serial = false;
@@ -325,7 +314,7 @@ body.platform--browser .nfx-detail__img{ max-width: 30em; }
     function buildUI() {
         if (built) return true;
         if (!serial_decided) decideSerial();
-        if (!is_serial) return true;   // leave original list untouched
+        if (!is_serial) return true;
 
         var modal = findModal();
         if (!modal || !modal.length) return false;
@@ -336,7 +325,7 @@ body.platform--browser .nfx-detail__img{ max-width: 30em; }
         var filesBox = findFilesBox(modal);
         if (!filesBox.length) return false;
 
-        filesBox.hide(); // keep DOM alive: original handlers / lazy images
+        filesBox.hide();
 
         ui = $('<div class="nfx-episodes">' +
             '<div class="nfx-episodes__strip-wrap"><div class="nfx-episodes__strip"></div></div>' +
@@ -368,20 +357,18 @@ body.platform--browser .nfx-detail__img{ max-width: 30em; }
             card.on('hover:focus', function () {
                 updateDetail(pair);
                 try {
-                    card[0].scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
+                    if (card[0] && card[0].scrollIntoView) {
+                        card[0].scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
+                    }
                 } catch (e) {
-                    if (stripWrap) stripWrap.scrollLeft = card[0].offsetLeft - stripWrap.clientWidth / 2;
+                    if (stripWrap && card[0]) stripWrap.scrollLeft = card[0].offsetLeft - stripWrap.clientWidth / 2;
                 }
-                // keep original item's lazy-load/focus behaviour alive
-                try { pair.item.trigger('hover:focus'); } catch (e) {}
+                try { if (pair.item) pair.item.trigger('hover:focus'); } catch (e) {}
             });
 
-            // Delegate the actual playback/menu actions back to the ORIGINAL
-            // item that Lampa's torrent.js created — keeps Player.play(),
-            // playlist building and hover:long menu untouched.
-            card.on('hover:enter', function () { pair.item.trigger('hover:enter'); });
-            card.on('hover:long',  function () { pair.item.trigger('hover:long');  });
-            card.on('hover:back',  function () { /* noop — Lampa handles modal back */ });
+            card.on('hover:enter', function () { if (pair.item) pair.item.trigger('hover:enter'); });
+            card.on('hover:long',  function () { if (pair.item) pair.item.trigger('hover:long');  });
+            card.on('hover:back',  function () {});
 
             strip.append(card);
         });
@@ -389,10 +376,9 @@ body.platform--browser .nfx-detail__img{ max-width: 30em; }
         filesBox.after(ui);
         detail = ui.find('.nfx-detail');
 
-        // Pick the first card as the initial focus target
         var firstCard = strip.find('.selector').first()[0];
         try {
-            if (Lampa.Controller && Lampa.Controller.collectionSet) {
+            if (window.Lampa && Lampa.Controller && Lampa.Controller.collectionSet) {
                 Lampa.Controller.collectionSet(modal);
                 if (firstCard && Lampa.Controller.collectionFocus) {
                     Lampa.Controller.collectionFocus(firstCard, modal);
@@ -424,11 +410,7 @@ body.platform--browser .nfx-detail__img{ max-width: 30em; }
         }, 60);
     }
 
-    /* --------------------------- lifecycle ------------------------------ */
-
     function watchModalRemoval(modal) {
-        // If the modal node is detached by any path that doesn't send
-        // 'list_close', we still want our state reset so the next open is clean.
         if (!modal || !modal.length) return;
         if (modal_observer) { try { modal_observer.disconnect(); } catch (e) {} modal_observer = null; }
         if (typeof MutationObserver === 'undefined') return;
@@ -444,7 +426,6 @@ body.platform--browser .nfx-detail__img{ max-width: 30em; }
     }
 
     function resetForOpen(e) {
-        // New list — full reset
         if (ui) { try { ui.remove(); } catch (err) {} ui = null; }
         if (modal_ref && modal_ref.length) {
             try { modal_ref.find('.torrent-files').show(); } catch (err) {}
@@ -480,40 +461,40 @@ body.platform--browser .nfx-detail__img{ max-width: 30em; }
         is_serial = false;
     }
 
-    /* ------------------------------ listener ---------------------------- */
-
     function start() {
-        if ($('#nfx-episodes-css').length === 0) {
-            $('head').append('<style id="nfx-episodes-css">' + CSS + '</style>');
+        try {
+            if ($('#nfx-episodes-css').length === 0) {
+                $('head').append('<style id="nfx-episodes-css">' + CSS + '</style>');
+            }
+
+            if (window.Lampa && Lampa.Listener) {
+                Lampa.Listener.follow('torrent_file', function (e) {
+                    if (!e || !e.type) return;
+
+                    if (e.type === 'list_open') {
+                        resetForOpen(e);
+                        if (fallback_timer) clearTimeout(fallback_timer);
+                        fallback_timer = setTimeout(function () {
+                            fallback_timer = null;
+                            decideSerialFallback();
+                        }, 1500);
+                    }
+
+                    if (e.type === 'render' && active && e.element && e.item) {
+                        pairs.push({ element: e.element, item: e.item });
+                        if (e.params) params_ref = e.params;
+                        if (!serial_decided) decideSerial();
+                        if (is_serial && !built) scheduleBuild(60);
+                    }
+
+                    if (e.type === 'list_close') {
+                        teardown();
+                    }
+                });
+            }
+        } catch (err) {
+            console.error('Netflix Episodes plugin initialization error:', err);
         }
-
-        Lampa.Listener.follow('torrent_file', function (e) {
-            if (!e || !e.type) return;
-
-            if (e.type === 'list_open') {
-                resetForOpen(e);
-                // list_open's `items` are raw file objects (not DOM) — we rely
-                // on 'render' events for the actual jQuery items.
-                // Fallback: if no episode element arrives soon after open,
-                // mark this as a non-serial list so we never shadow a movie.
-                if (fallback_timer) clearTimeout(fallback_timer);
-                fallback_timer = setTimeout(function () {
-                    fallback_timer = null;
-                    decideSerialFallback();
-                }, 1500);
-            }
-
-            if (e.type === 'render' && active && e.element && e.item) {
-                pairs.push({ element: e.element, item: e.item });
-                if (e.params) params_ref = e.params;
-                if (!serial_decided) decideSerial();
-                if (is_serial && !built) scheduleBuild(60);
-            }
-
-            if (e.type === 'list_close') {
-                teardown();
-            }
-        });
     }
 
     if (window.Lampa && Lampa.Listener) start();
