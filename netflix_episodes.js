@@ -6,106 +6,91 @@
 
     var PLUGIN_NAME = 'Netflix Episodes';
 
-    /* ------------------------------ styles (Tizen-safe) ------------------------------ */
+    /* ------------------------------ styles ------------------------------ */
 
     var CSS = `
 .nfx-episodes{
-    padding: 10px 20px 20px;
-    background: #111115;
-    box-sizing: border-box;
-    width: 100%;
+    padding: 0 1.2em 1.5em;
 }
 .nfx-episodes__strip-wrap{
     overflow-x: auto;
     overflow-y: hidden;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
-    margin: 0 -20px;
-    padding: 10px 20px;
-    white-space: nowrap;
+    margin: 0 -1.2em;
+    padding: 0.8em 1.2em 0.4em;
 }
 .nfx-episodes__strip-wrap::-webkit-scrollbar{ display: none; }
 .nfx-episodes__strip{
     display: flex;
-    align-items: center;
-}
-.nfx-episodes__strip > * {
-    margin-right: 12px;
-}
-.nfx-episodes__strip > *:last-child {
-    margin-right: 0;
+    gap: 0.9em;
+    align-items: stretch;
 }
 .nfx-season{
     flex: 0 0 auto;
-    font-size: 14px;
-    font-weight: 700;
+    align-self: center;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    font-size: .85em;
+    letter-spacing: .18em;
     text-transform: uppercase;
-    color: #aaaaaa;
-    padding: 8px 12px;
-    background: #1e1e24;
-    border-radius: 4px;
+    opacity: .45;
+    padding: .4em 0;
     user-select: none;
-    letter-spacing: 1px;
 }
 .nfx-card{
     flex: 0 0 auto;
-    width: 170px;
-    padding: 14px 12px;
-    border-radius: 6px;
-    background: #25252c;
-    border: 2px solid #3a3a44;
+    width: 11.5em;
+    padding: 1.1em 1em 1em;
+    border-radius: 0.5em;
+    background: rgba(255,255,255,0.06);
+    border: 2px solid transparent;
     cursor: pointer;
+    transition: background .15s, transform .15s, border-color .15s;
     box-sizing: border-box;
 }
 .nfx-card.focus{
-    background: #3b3b47;
-    border-color: #ffffff;
-    transform: scale(1.04);
+    background: rgba(255,255,255,0.16);
+    border-color: #fff;
+    transform: scale(1.05);
 }
 .nfx-card__num{
-    font-size: 30px;
-    font-weight: 800;
+    font-size: 2em;
+    font-weight: 700;
     line-height: 1;
-    color: #ffffff;
-    margin-bottom: 6px;
+    opacity: .85;
+    margin-bottom: .35em;
 }
 .nfx-card__name{
-    font-size: 14px;
-    font-weight: 500;
+    font-size: 1.05em;
+    font-weight: 400;
     line-height: 1.3;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    height: 36px;
-    color: #dddddd;
-    white-space: normal;
+    min-height: 2.6em;
+    opacity: .8;
 }
-.nfx-card.focus .nfx-card__name{ 
-    color: #ffffff; 
-}
-.nfx-card--watched{ opacity: 0.5; }
+.nfx-card.focus .nfx-card__name{ opacity: 1; }
+.nfx-card--watched{ opacity: .55; }
 .nfx-card--file .nfx-card__num{
-    font-size: 18px;
-    font-weight: 600;
+    font-size: 1.2em;
+    font-weight: 500;
 }
 
 .nfx-detail{
     display: flex;
-    margin-top: 20px;
+    gap: 1.6em;
+    margin-top: 1.4em;
     align-items: flex-start;
-}
-.nfx-detail > * {
-    margin-right: 24px;
-}
-.nfx-detail > *:last-child {
-    margin-right: 0;
 }
 .nfx-detail__img{
     flex: 0 0 auto;
-    width: 320px;
-    height: 180px;
-    border-radius: 8px;
+    width: 22em;
+    max-width: 38vw;
+    aspect-ratio: 16/9;
+    border-radius: 0.5em;
     overflow: hidden;
     background: #1a1a1a;
     position: relative;
@@ -121,59 +106,67 @@
 .nfx-detail__img img.loaded{ opacity: 1; }
 .nfx-detail__img-empty{
     position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
+    inset: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 36px;
+    font-size: 3em;
     font-weight: 700;
-    color: #555555;
-    background: #1c1f24;
+    color: rgba(255,255,255,0.25);
+    background: linear-gradient(135deg,#20242b,#14161a);
 }
-.nfx-detail__body{ 
-    min-width: 0; 
-    flex: 1; 
-}
+.nfx-detail__body{ min-width: 0; flex: 1; }
 .nfx-detail__title{
-    font-size: 24px;
-    font-weight: 700;
+    font-size: 1.7em;
+    font-weight: 600;
     line-height: 1.2;
-    margin-bottom: 6px;
-    color: #ffffff;
+    margin-bottom: .35em;
 }
 .nfx-detail__meta{
-    font-size: 15px;
-    font-weight: 400;
-    color: #aaaaaa;
-    margin-bottom: 12px;
+    font-size: 1.05em;
+    font-weight: 300;
+    opacity: .75;
+    margin-bottom: .8em;
 }
 .nfx-detail__meta span + span::before{
     content: ' • ';
-    opacity: 0.6;
+    opacity: .6;
 }
 .nfx-detail__meta .nfx-detail__size{
-    background: #333333;
-    color: #ffffff;
-    border-radius: 4px;
-    padding: 2px 8px;
+    background: rgba(255,255,255,0.12);
+    border-radius: .3em;
+    padding: .1em .45em;
 }
 .nfx-detail__overview{
-    font-size: 16px;
-    font-weight: 400;
+    font-size: 1.15em;
+    font-weight: 300;
     line-height: 1.5;
-    color: #dddddd;
-    max-width: 900px;
-    white-space: normal;
+    opacity: .9;
+    max-width: 60em;
 }
-.nfx-detail__overview--empty{ opacity: 0.45; font-style: italic; }
+.nfx-detail__overview--empty{ opacity: .45; font-style: italic; }
+
+body.platform--browser .nfx-detail__img{ max-width: 30em; }
+
+@media screen and (max-width: 767px){
+    .nfx-episodes{ padding: 0 .8em 1em; }
+    .nfx-card{ width: 9em; padding: .9em .8em .8em; }
+    .nfx-card__num{ font-size: 1.6em; }
+    .nfx-detail{ flex-direction: column; gap: 1em; }
+    .nfx-detail__img{ width: 100%; max-width: 100%; }
+    .nfx-detail__title{ font-size: 1.35em; }
+    .nfx-detail__overview{ font-size: 1em; }
+}
 `;
 
-    var pairs = [];
-    var ui = null;
-    var detail = null;
-    var active = false;
-    var built = false;
-    var serial_decided = false;
+    /* ------------------------------ state ------------------------------- */
+
+    var pairs = [];          // [{element, item}] collected from 'render' events
+    var ui = null;           // our root jQuery node
+    var detail = null;       // detail panel node
+    var active = false;      // a files list is currently open
+    var built = false;       // our UI has been inserted
+    var serial_decided = false; // we already decided this list is/isn't serials
     var is_serial = false;
     var retry_timer = null;
     var fallback_timer = null;
@@ -181,22 +174,14 @@
     var modal_ref = null;
     var modal_observer = null;
 
+    /* ------------------------------ helpers ----------------------------- */
+
     function esc(s) {
-        try {
-            return $('<div>').text(s == null ? '' : s).html();
-        } catch (e) {
-            return '';
-        }
+        return $('<div>').text(s == null ? '' : s).html();
     }
 
     function isEpisodeElement(el) {
         return !!(el && el.season != null && el.episode != null && el.episode !== '');
-    }
-
-    function hasValidSeasons(params) {
-        if (!params || !params.seasons) return false;
-        var keys = Object.keys(params.seasons);
-        return keys.length > 0;
     }
 
     function episodesArrayFor(seasonNum, params) {
@@ -212,10 +197,12 @@
         var list = episodesArrayFor(element && element.season, params);
         if (!list) return null;
         for (var i = 0; i < list.length; i++) {
-            if (list[i] && list[i].episode_number == element.episode) return list[i];
+            if (list[i].episode_number == element.episode) return list[i];
         }
         return null;
     }
+
+    /* ------------------------------ UI bits ----------------------------- */
 
     function cardHtml(pair) {
         var el = pair.element;
@@ -248,10 +235,10 @@
         var meta = findEpisodeMeta(el, params_ref);
         var isEp = isEpisodeElement(el);
 
-        var img = '';
-        try {
-            img = el.img || (meta && meta.still_path && window.Lampa && Lampa.Api && Lampa.Api.img ? Lampa.Api.img(meta.still_path) : '');
-        } catch (e) {}
+        var img = el.img
+            || (meta && meta.still_path && Lampa.Api && Lampa.Api.img
+                ? Lampa.Api.img(meta.still_path)
+                : '');
 
         var title = isEp
             ? ((meta && meta.name) || el.fname || el.title || ('Эпизод ' + el.episode))
@@ -291,6 +278,8 @@
         }
     }
 
+    /* ------------------------------ modal find -------------------------- */
+
     function findModal() {
         if (modal_ref && modal_ref.length && modal_ref.closest('body').length) return modal_ref;
         var m = $('.modal:visible').last();
@@ -304,26 +293,29 @@
         return box.length ? box : $();
     }
 
+    /* ------------------------------ build UI ---------------------------- */
+
     function anyEpisodes() {
-        if (!hasValidSeasons(params_ref)) return false;
-        var epCount = 0;
         for (var i = 0; i < pairs.length; i++) {
-            if (isEpisodeElement(pairs[i].element)) {
-                epCount++;
-            }
+            if (isEpisodeElement(pairs[i].element)) return true;
         }
-        return epCount >= 2;
+        return false;
     }
 
     function decideSerial() {
+        // is_serial=true only when we actually saw an episode element.
+        // For non-serial file lists (movies, single files) we keep the original UI.
         if (serial_decided) return;
         if (anyEpisodes()) {
             is_serial = true;
             serial_decided = true;
         }
+        // If nothing episode-like yet, we stay undecided: render events that
+        // may still arrive, or list_open's raw items may hint otherwise.
     }
 
     function decideSerialFallback() {
+        // Called when we never saw an episode element. Treat as not serial.
         if (!serial_decided) {
             serial_decided = true;
             is_serial = false;
@@ -333,24 +325,18 @@
     function buildUI() {
         if (built) return true;
         if (!serial_decided) decideSerial();
-        if (!is_serial) return true;
+        if (!is_serial) return true;   // leave original list untouched
 
         var modal = findModal();
         if (!modal || !modal.length) return false;
         modal_ref = modal;
 
-        var existingUi = modal.find('.nfx-episodes');
-        if (existingUi.length) {
-            ui = existingUi;
-            detail = ui.find('.nfx-detail');
-            built = true;
-            return true;
-        }
+        if (modal.find('.nfx-episodes').length) { built = true; return true; }
 
         var filesBox = findFilesBox(modal);
         if (!filesBox.length) return false;
 
-        filesBox.hide();
+        filesBox.hide(); // keep DOM alive: original handlers / lazy images
 
         ui = $('<div class="nfx-episodes">' +
             '<div class="nfx-episodes__strip-wrap"><div class="nfx-episodes__strip"></div></div>' +
@@ -373,9 +359,7 @@
             var seasonKey = isEpisodeElement(el) ? ('s' + el.season) : 'other';
             if (seasonKey !== lastSeason) {
                 lastSeason = seasonKey;
-                // Добавляем отступ слева для первой плашки сезона, чтобы она не прижималась вплотную к краю
-                var seasonClass = 'nfx-season' + (strip.children().length === 0 ? ' nfx-season--first' : '');
-                strip.append('<div class="' + seasonClass + '">' + esc(seasonLabel(el)) + '</div>');
+                strip.append('<div class="nfx-season">' + esc(seasonLabel(el)) + '</div>');
             }
 
             var card = cardHtml(pair);
@@ -383,18 +367,21 @@
 
             card.on('hover:focus', function () {
                 updateDetail(pair);
-                if (stripWrap && card[0]) {
-                    var cardLeft = card[0].offsetLeft;
-                    var cardWidth = card[0].offsetWidth;
-                    var wrapWidth = stripWrap.clientWidth;
-                    stripWrap.scrollLeft = cardLeft - (wrapWidth / 2) + (cardWidth / 2);
+                try {
+                    card[0].scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
+                } catch (e) {
+                    if (stripWrap) stripWrap.scrollLeft = card[0].offsetLeft - stripWrap.clientWidth / 2;
                 }
-                try { if (pair.item) pair.item.trigger('hover:focus'); } catch (e) {}
+                // keep original item's lazy-load/focus behaviour alive
+                try { pair.item.trigger('hover:focus'); } catch (e) {}
             });
 
-            card.on('hover:enter', function () { if (pair.item) pair.item.trigger('hover:enter'); });
-            card.on('hover:long',  function () { if (pair.item) pair.item.trigger('hover:long');  });
-            card.on('hover:back',  function () {});
+            // Delegate the actual playback/menu actions back to the ORIGINAL
+            // item that Lampa's torrent.js created — keeps Player.play(),
+            // playlist building and hover:long menu untouched.
+            card.on('hover:enter', function () { pair.item.trigger('hover:enter'); });
+            card.on('hover:long',  function () { pair.item.trigger('hover:long');  });
+            card.on('hover:back',  function () { /* noop — Lampa handles modal back */ });
 
             strip.append(card);
         });
@@ -402,9 +389,10 @@
         filesBox.after(ui);
         detail = ui.find('.nfx-detail');
 
+        // Pick the first card as the initial focus target
         var firstCard = strip.find('.selector').first()[0];
         try {
-            if (window.Lampa && Lampa.Controller && Lampa.Controller.collectionSet) {
+            if (Lampa.Controller && Lampa.Controller.collectionSet) {
                 Lampa.Controller.collectionSet(modal);
                 if (firstCard && Lampa.Controller.collectionFocus) {
                     Lampa.Controller.collectionFocus(firstCard, modal);
@@ -436,7 +424,11 @@
         }, 60);
     }
 
+    /* --------------------------- lifecycle ------------------------------ */
+
     function watchModalRemoval(modal) {
+        // If the modal node is detached by any path that doesn't send
+        // 'list_close', we still want our state reset so the next open is clean.
         if (!modal || !modal.length) return;
         if (modal_observer) { try { modal_observer.disconnect(); } catch (e) {} modal_observer = null; }
         if (typeof MutationObserver === 'undefined') return;
@@ -452,6 +444,7 @@
     }
 
     function resetForOpen(e) {
+        // New list — full reset
         if (ui) { try { ui.remove(); } catch (err) {} ui = null; }
         if (modal_ref && modal_ref.length) {
             try { modal_ref.find('.torrent-files').show(); } catch (err) {}
@@ -487,41 +480,40 @@
         is_serial = false;
     }
 
+    /* ------------------------------ listener ---------------------------- */
+
     function start() {
-        try {
-            if ($('#nfx-episodes-css').length === 0) {
-                $('head').append('<style id="nfx-episodes-css">' + CSS + '</style>');
-            }
-
-            if (window.Lampa && Lampa.Listener) {
-                Lampa.Listener.follow('torrent_file', function (e) {
-                    if (!e || !e.type) return;
-
-                    if (e.type === 'list_open') {
-                        resetForOpen(e);
-                        if (e.params) params_ref = e.params;
-                        if (fallback_timer) clearTimeout(fallback_timer);
-                        fallback_timer = setTimeout(function () {
-                            fallback_timer = null;
-                            decideSerialFallback();
-                        }, 1500);
-                    }
-
-                    if (e.type === 'render' && active && e.element && e.item) {
-                        pairs.push({ element: e.element, item: e.item });
-                        if (e.params) params_ref = e.params;
-                        if (!serial_decided) decideSerial();
-                        if (is_serial && !built) scheduleBuild(60);
-                    }
-
-                    if (e.type === 'list_close') {
-                        teardown();
-                    }
-                });
-            }
-        } catch (err) {
-            console.error('Netflix Episodes plugin initialization error:', err);
+        if ($('#nfx-episodes-css').length === 0) {
+            $('head').append('<style id="nfx-episodes-css">' + CSS + '</style>');
         }
+
+        Lampa.Listener.follow('torrent_file', function (e) {
+            if (!e || !e.type) return;
+
+            if (e.type === 'list_open') {
+                resetForOpen(e);
+                // list_open's `items` are raw file objects (not DOM) — we rely
+                // on 'render' events for the actual jQuery items.
+                // Fallback: if no episode element arrives soon after open,
+                // mark this as a non-serial list so we never shadow a movie.
+                if (fallback_timer) clearTimeout(fallback_timer);
+                fallback_timer = setTimeout(function () {
+                    fallback_timer = null;
+                    decideSerialFallback();
+                }, 1500);
+            }
+
+            if (e.type === 'render' && active && e.element && e.item) {
+                pairs.push({ element: e.element, item: e.item });
+                if (e.params) params_ref = e.params;
+                if (!serial_decided) decideSerial();
+                if (is_serial && !built) scheduleBuild(60);
+            }
+
+            if (e.type === 'list_close') {
+                teardown();
+            }
+        });
     }
 
     if (window.Lampa && Lampa.Listener) start();
