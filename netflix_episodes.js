@@ -24,55 +24,61 @@
 .nfx-episodes__strip{
     display: flex;
     gap: 0.9em;
-    align-items: stretch;
+    align-items: center;
 }
 .nfx-season{
     flex: 0 0 auto;
-    align-self: center;
-    writing-mode: vertical-rl;
-    transform: rotate(180deg);
-    font-size: .85em;
-    letter-spacing: .18em;
+    font-size: 1em;
+    font-weight: 700;
     text-transform: uppercase;
-    opacity: .45;
-    padding: .4em 0;
+    opacity: 0.8;
+    padding: 0 0.5em;
     user-select: none;
+    letter-spacing: 0.05em;
+    color: #fff;
 }
 .nfx-card{
     flex: 0 0 auto;
     width: 11.5em;
     padding: 1.1em 1em 1em;
-    border-radius: 0.5em;
-    background: rgba(255,255,255,0.06);
-    border: 2px solid transparent;
+    border-radius: 0.6em;
+    background: rgba(30, 30, 35, 0.85);
+    border: 2px solid rgba(255, 255, 255, 0.15);
     cursor: pointer;
-    transition: background .15s, transform .15s, border-color .15s;
+    transition: background .15s, transform .15s, border-color .15s, box-shadow .15s;
     box-sizing: border-box;
 }
 .nfx-card.focus{
-    background: rgba(255,255,255,0.16);
-    border-color: #fff;
-    transform: scale(1.05);
+    background: rgba(50, 50, 60, 0.95);
+    border-color: #ffffff;
+    transform: scale(1.08);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
 }
 .nfx-card__num{
-    font-size: 2em;
-    font-weight: 700;
+    font-size: 2.2em;
+    font-weight: 800;
     line-height: 1;
-    opacity: .85;
+    color: #ffffff;
+    opacity: 0.95;
     margin-bottom: .35em;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
 }
 .nfx-card__name{
-    font-size: 1.05em;
-    font-weight: 400;
+    font-size: 1.1em;
+    font-weight: 500;
     line-height: 1.3;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
     min-height: 2.6em;
-    opacity: .8;
+    color: #e0e0e0;
+    opacity: 0.9;
 }
-.nfx-card.focus .nfx-card__name{ opacity: 1; }
+.nfx-card.focus .nfx-card__name{ 
+    color: #ffffff;
+    opacity: 1; 
+}
 .nfx-card--watched{ opacity: .55; }
 .nfx-card--file .nfx-card__num{
     font-size: 1.2em;
@@ -121,12 +127,14 @@
     font-weight: 600;
     line-height: 1.2;
     margin-bottom: .35em;
+    color: #fff;
 }
 .nfx-detail__meta{
     font-size: 1.05em;
     font-weight: 300;
     opacity: .75;
     margin-bottom: .8em;
+    color: #fff;
 }
 .nfx-detail__meta span + span::before{
     content: ' • ';
@@ -143,6 +151,7 @@
     line-height: 1.5;
     opacity: .9;
     max-width: 60em;
+    color: #ddd;
 }
 .nfx-detail__overview--empty{ opacity: .45; font-style: italic; }
 
@@ -182,6 +191,13 @@ body.platform--browser .nfx-detail__img{ max-width: 30em; }
 
     function isEpisodeElement(el) {
         return !!(el && el.season != null && el.episode != null && el.episode !== '');
+    }
+
+    // Проверка, является ли контент реальным сериалом (должны быть сезоны в параметрах)
+    function hasValidSeasons(params) {
+        if (!params || !params.seasons) return false;
+        var keys = Object.keys(params.seasons);
+        return keys.length > 0;
     }
 
     function episodesArrayFor(seasonNum, params) {
@@ -290,10 +306,17 @@ body.platform--browser .nfx-detail__img{ max-width: 30em; }
     }
 
     function anyEpisodes() {
+        // Дополнительно проверяем наличие сезонов через params_ref
+        if (!hasValidSeasons(params_ref)) return false;
+        
+        var epCount = 0;
         for (var i = 0; i < pairs.length; i++) {
-            if (isEpisodeElement(pairs[i].element)) return true;
+            if (isEpisodeElement(pairs[i].element)) {
+                epCount++;
+            }
         }
-        return false;
+        // Если серий меньше 2, скорее всего это фильм или одиночный файл
+        return epCount >= 2;
     }
 
     function decideSerial() {
@@ -473,6 +496,7 @@ body.platform--browser .nfx-detail__img{ max-width: 30em; }
 
                     if (e.type === 'list_open') {
                         resetForOpen(e);
+                        if (e.params) params_ref = e.params;
                         if (fallback_timer) clearTimeout(fallback_timer);
                         fallback_timer = setTimeout(function () {
                             fallback_timer = null;
@@ -507,3 +531,4 @@ body.platform--browser .nfx-detail__img{ max-width: 30em; }
         }, 200);
     }
 })();
+```[cite: 3]
